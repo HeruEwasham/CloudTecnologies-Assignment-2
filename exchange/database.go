@@ -10,15 +10,14 @@ import "errors"
 import "bytes"
 import "strconv"
 
-
 // Webhook - This is the struct which will hold information about a webhook.
 type Webhook struct {
-	WebhookURL      string   `json:"webhookurl"`
-	BaseCurrency    string   `json:"baseCurrency"`
-	TargetCurrency  string   `json:"targetCurrency"`
-	MinTriggerValue float32  `json:"minTriggerValue"`
-	MaxTriggerValue float32  `json:"maxTriggerValue"`
-	ID        		string   `json:"id"`
+	WebhookURL      string  `json:"webhookurl"`
+	BaseCurrency    string  `json:"baseCurrency"`
+	TargetCurrency  string  `json:"targetCurrency"`
+	MinTriggerValue float32 `json:"minTriggerValue"`
+	MaxTriggerValue float32 `json:"maxTriggerValue"`
+	ID              string  `json:"id"`
 }
 
 /*// WebhookID - This is the struct which will hold the id if a given webhook when we ask about it
@@ -31,33 +30,34 @@ type WebhookID struct {
 
 // CurrencyRequest - This is the struct which will hold information about currencies from user.
 type CurrencyRequest struct {
-	BaseCurrency    string   `json:"baseCurrency"`
-	TargetCurrency  string   `json:"targetCurrency"`
+	BaseCurrency   string `json:"baseCurrency"`
+	TargetCurrency string `json:"targetCurrency"`
 }
 
-// Currency - This is the struct which holds the currencies from 
+// Currency - This is the struct which holds the currencies from
 type Currency struct {
-	Base  string      	     `json:"base"`
-	Date  string         	 `json:"date"`
+	Base  string             `json:"base"`
+	Date  string             `json:"date"`
 	Rates map[string]float32 `json:"rates"`
 }
 
-// SendWebhook - This is the struct which we use to make json to send 
+// SendWebhook - This is the struct which we use to make json to send
 type SendWebhook struct {
-	BaseCurrency    string   `json:"baseCurrency"`
-	TargetCurrency  string   `json:"targetCurrency"`
-	CurrentRate     float32  `json:"currentRate"`
-	MinTriggerValue float32  `json:"minTriggerValue"`
-	MaxTriggerValue float32  `json:"maxTriggerValue"`
+	BaseCurrency    string  `json:"baseCurrency"`
+	TargetCurrency  string  `json:"targetCurrency"`
+	CurrentRate     float32 `json:"currentRate"`
+	MinTriggerValue float32 `json:"minTriggerValue"`
+	MaxTriggerValue float32 `json:"maxTriggerValue"`
 }
 
 // MessageWebhook - This is a struct which is used to send messages via webhook
 type MessageWebhook struct {
-	Heading       string   `json:"heading"`
-	DateTime	  string   `json:"dateTime"`
-	Message  	  string   `json:"message"`
-	FromService   string   `json:"fromService"`
+	Heading     string `json:"heading"`
+	DateTime    string `json:"dateTime"`
+	Message     string `json:"message"`
+	FromService string `json:"fromService"`
 }
+
 // Storage represent a unified way of getting webhook storage
 type Storage interface {
 	Init()
@@ -76,7 +76,7 @@ type Storage interface {
 type MongoDB struct {
 	DatabaseURL            string
 	DatabaseName           string
-	WebhookCollectionName string
+	WebhookCollectionName  string
 	CurrencyCollectionName string
 }
 
@@ -84,8 +84,8 @@ type MongoDB struct {
 var DB Storage
 
 // FloatToString - Convert float to string
-func FloatToString(inputNum float32) string {				// Gotten from: https://stackoverflow.com/questions/19101419/go-golang-formatfloat-convert-float-number-to-string
-    // to convert a float number to a string
+func FloatToString(inputNum float32) string { // Gotten from: https://stackoverflow.com/questions/19101419/go-golang-formatfloat-convert-float-number-to-string
+	// to convert a float number to a string
 	return strconv.FormatFloat(float64(inputNum), 'f', -1, 32)
 	//return fmt.Sprintf("%.6f", inputNum)
 }
@@ -105,8 +105,8 @@ func (DB *MongoDB) Init() {
 		Sparse:     true,
 	}
 	err = session.DB(DB.DatabaseName).C(DB.CurrencyCollectionName).EnsureIndex(index)
-	if err != nil {	
-		panic(err)	
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -123,7 +123,7 @@ func (DB *MongoDB) RegisterWebhookToDatabase(webhook Webhook) (string, int, erro
 	if err != nil {
 		return "", 500, err
 	}
-	
+
 	fmt.Println(webhook.ID)
 	return webhook.ID, 201, nil
 }
@@ -155,7 +155,7 @@ func (DB *MongoDB) GetWebhook(id string) (Webhook, int, error) {
 
 	err = session.DB(DB.DatabaseName).C(DB.WebhookCollectionName).Find(bson.M{"id": id}).One(&webhook)
 	if err != nil {
-		return webhook, http.StatusBadRequest, err				// Suppose the reason for error here is because it can't find webhook with the user-sent id.
+		return webhook, http.StatusBadRequest, err // Suppose the reason for error here is because it can't find webhook with the user-sent id.
 	}
 	return webhook, http.StatusFound, nil
 }
@@ -170,13 +170,13 @@ func (DB *MongoDB) DeleteWebhook(id string) (int, error) {
 
 	err = session.DB(DB.DatabaseName).C(DB.WebhookCollectionName).Remove(bson.M{"id": id})
 	if err != nil {
-		return http.StatusBadRequest, err				// Suppose the reason for error here is because it can't find webhook with the user-sent id.
+		return http.StatusBadRequest, err // Suppose the reason for error here is because it can't find webhook with the user-sent id.
 	}
 	return http.StatusFound, nil
 }
 
 // GetLatest return the latest between currencies.
-func (DB *MongoDB) GetLatest(targetCurrency string) (float32,  string, int, error) {
+func (DB *MongoDB) GetLatest(targetCurrency string) (float32, string, int, error) {
 	session, err := mgo.Dial(DB.DatabaseURL)
 	if err != nil {
 		return -1, "", 500, err
@@ -186,13 +186,13 @@ func (DB *MongoDB) GetLatest(targetCurrency string) (float32,  string, int, erro
 	dbSize, err := session.DB(DB.DatabaseName).C(DB.CurrencyCollectionName).Count()
 	if err != nil {
 		return -1, "", 500, err
-	}	
-	err = session.DB(DB.DatabaseName).C(DB.CurrencyCollectionName).Find(bson.M{}).Sort("date").Skip(dbSize-1).One(&latestCurrency) // Gotten from: https://stackoverflow.com/questions/38127583/get-last-inserted-element-from-mongodb-in-golang
+	}
+	err = session.DB(DB.DatabaseName).C(DB.CurrencyCollectionName).Find(bson.M{}).Sort("date").Skip(dbSize - 1).One(&latestCurrency) // Gotten from: https://stackoverflow.com/questions/38127583/get-last-inserted-element-from-mongodb-in-golang
 	if err != nil {
 		return -1, "", http.StatusBadRequest, err
 	}
-	val, ok := latestCurrency.Rates[targetCurrency]	// This line + if sentence I have gotten from: https://stackoverflow.com/questions/2050391/how-to-check-if-a-map-contains-a-key-in-go
-	if !ok {										// If an error, ie. targetCurrency do not exist.	
+	val, ok := latestCurrency.Rates[targetCurrency] // This line + if sentence I have gotten from: https://stackoverflow.com/questions/2050391/how-to-check-if-a-map-contains-a-key-in-go
+	if !ok {                                        // If an error, ie. targetCurrency do not exist.
 		return -1, "", http.StatusBadRequest, errors.New("TargetCurrency not an accepted rate")
 	}
 	return val, latestCurrency.Date, http.StatusFound, nil
@@ -208,24 +208,24 @@ func (DB *MongoDB) GetAverage(targetCurrency string) (float32, int, error) {
 	latestCurrencies := []Currency{}
 	dbSize, err := session.DB(DB.DatabaseName).C(DB.CurrencyCollectionName).Count()
 	if err != nil {
-			return -1, 500, err
-	}	
-	err = session.DB(DB.DatabaseName).C(DB.CurrencyCollectionName).Find(bson.M{}).Sort("date").Skip(dbSize-3).All(&latestCurrencies) // Get the last 7 entries (last seven days). Gotten from: https://stackoverflow.com/questions/38127583/get-last-inserted-element-from-mongodb-in-golang and https://stackoverflow.com/questions/27165692/how-to-get-all-element-from-mongodb-array-using-go
+		return -1, 500, err
+	}
+	err = session.DB(DB.DatabaseName).C(DB.CurrencyCollectionName).Find(bson.M{}).Sort("date").Skip(dbSize - 3).All(&latestCurrencies) // Get the last 7 entries (last seven days). Gotten from: https://stackoverflow.com/questions/38127583/get-last-inserted-element-from-mongodb-in-golang and https://stackoverflow.com/questions/27165692/how-to-get-all-element-from-mongodb-array-using-go
 	if err != nil {
 		return -1, http.StatusBadRequest, err
 	}
 	var total float32
-	for i:=0;i<3;i++ {
-		val, ok := latestCurrencies[i].Rates[targetCurrency]	// This line + if sentence I have gotten from: https://stackoverflow.com/questions/2050391/how-to-check-if-a-map-contains-a-key-in-go
-		if !ok {												// If an error, ie. targetCurrency do not exist.	
+	for i := 0; i < 3; i++ {
+		val, ok := latestCurrencies[i].Rates[targetCurrency] // This line + if sentence I have gotten from: https://stackoverflow.com/questions/2050391/how-to-check-if-a-map-contains-a-key-in-go
+		if !ok {                                             // If an error, ie. targetCurrency do not exist.
 			return -1, http.StatusBadRequest, errors.New("TargetCurrency not an accepted rate in " + string(i))
 		}
 		total += val
 	}
-	return total/3, http.StatusFound, nil			// Return average of the last seven days
+	return total / 3, http.StatusFound, nil // Return average of the last seven days
 }
 
-// GetAllWebhooks gets all webhooks 
+// GetAllWebhooks gets all webhooks
 func (DB *MongoDB) GetAllWebhooks() ([]Webhook, int, error) {
 	webhooks := []Webhook{}
 	session, err := mgo.Dial(DB.DatabaseURL)
@@ -266,29 +266,28 @@ func (DB *MongoDB) ResetCurrency() bool {
 	return true
 }
 
-
 // SendWebhookFunc sends info to a webhook.
 func SendWebhookFunc(webhook Webhook, currentRate float32) (int, error) {
 	//if currentRate <= webhook.MinTriggerValue || currentRate >= webhook.MaxTriggerValue {		// If you should send a webhook request (check a second/last time).
-		sendWebhook := SendWebhook{}
-		sendWebhook.BaseCurrency = webhook.BaseCurrency
-		sendWebhook.CurrentRate = currentRate
-		sendWebhook.MaxTriggerValue = webhook.MaxTriggerValue
-		sendWebhook.MinTriggerValue = webhook.MinTriggerValue
-		sendWebhook.TargetCurrency = webhook.TargetCurrency
-		
-		// This code gotten from: https://stackoverflow.com/questions/24455147/how-do-i-send-a-json-string-in-a-post-request-in-go
-		jsonStr := new(bytes.Buffer)
-		json.NewEncoder(jsonStr).Encode(&sendWebhook)
-		resp, err := http.Post(webhook.WebhookURL, "application/json", jsonStr)
-		if err != nil {
-			return http.StatusExpectationFailed, err	// http.StatusExpectationFailed hears out to be the best when not connecting to url (or something there)
-		}
-		defer resp.Body.Close()
-		if resp.StatusCode == 200 || resp.StatusCode == 204 {
-			return http.StatusOK, nil					// Has done the job without problems.
-		}
-		return http.StatusBadRequest, errors.New("We didn't get the correct statuscode, we got" + string(resp.StatusCode) + "But expected 200 or 204")
+	sendWebhook := SendWebhook{}
+	sendWebhook.BaseCurrency = webhook.BaseCurrency
+	sendWebhook.CurrentRate = currentRate
+	sendWebhook.MaxTriggerValue = webhook.MaxTriggerValue
+	sendWebhook.MinTriggerValue = webhook.MinTriggerValue
+	sendWebhook.TargetCurrency = webhook.TargetCurrency
+
+	// This code gotten from: https://stackoverflow.com/questions/24455147/how-do-i-send-a-json-string-in-a-post-request-in-go
+	jsonStr := new(bytes.Buffer)
+	json.NewEncoder(jsonStr).Encode(&sendWebhook)
+	resp, err := http.Post(webhook.WebhookURL, "application/json", jsonStr)
+	if err != nil {
+		return http.StatusExpectationFailed, err // http.StatusExpectationFailed hears out to be the best when not connecting to url (or something there)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == 200 || resp.StatusCode == 204 {
+		return http.StatusOK, nil // Has done the job without problems.
+	}
+	return http.StatusBadRequest, errors.New("We didn't get the correct statuscode, we got" + string(resp.StatusCode) + "But expected 200 or 204")
 	//}
 	//return http.StatusExpectationFailed, errors.New("Error when checking between values") // errors.New("Current rate is " + string(currentRate) + " which is between min and max, which is " + string(webhook.MinTriggerValue) + " and " + string(webhook.MaxTriggerValue))				// An error message if needed for debugging.
 }
@@ -314,46 +313,46 @@ func SendMessageWebhook(msg MessageWebhook) bool {
 func RegisterWebhook(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(r.URL.Path, "/") // Parts of response
 	fmt.Println(parts)
-	if len(parts) == 2 {						// Is /exchange
+	if len(parts) == 2 { // Is /exchange
 		if r.Method == "POST" {
 			webhook := Webhook{}
-			decodeErr := json.NewDecoder(r.Body).Decode(&webhook)	// Get POST-request
+			decodeErr := json.NewDecoder(r.Body).Decode(&webhook) // Get POST-request
 			if decodeErr != nil {
-				http.Error(w, "Bad request: Decoding didn't work on POST-input. " + decodeErr.Error(), http.StatusBadRequest)
+				http.Error(w, "Bad request: Decoding didn't work on POST-input. "+decodeErr.Error(), http.StatusBadRequest)
 				return
 			}
-			if webhook.BaseCurrency != "EUR" {					// If not implemented currency
-				http.Error(w, "Not implemented: We accept just Euro as base-currency, while you gave us " + webhook.BaseCurrency, http.StatusNotImplemented)
+			if webhook.BaseCurrency != "EUR" { // If not implemented currency
+				http.Error(w, "Not implemented: We accept just Euro as base-currency, while you gave us "+webhook.BaseCurrency, http.StatusNotImplemented)
 				return
 			}
 			id, statusCode, err := DB.RegisterWebhookToDatabase(webhook)
 			if err != nil {
-				http.Error(w, "Something went wrong when registering a webhook: " + err.Error(), statusCode)
+				http.Error(w, "Something went wrong when registering a webhook: "+err.Error(), statusCode)
 				return
 			}
 			http.Header.Add(w.Header(), "content-type", "text")
-			w.WriteHeader(statusCode)	
+			w.WriteHeader(statusCode)
 			fmt.Fprintf(w, string(id))
 		} else {
 			http.Error(w, "Not implemented: We only support POST for this functionality.", http.StatusNotImplemented)
 			return
 		}
-	} else if (len(parts) == 3 /*&& parts[2] == "0"*/) { // Is /exchange/{id}
+	} else if len(parts) == 3 /*&& parts[2] == "0"*/ { // Is /exchange/{id}
 		if r.Method == "GET" {
-			webhook, statusCode, err := DB.GetWebhook(parts[2])		// Get webhook by id from user
+			webhook, statusCode, err := DB.GetWebhook(parts[2]) // Get webhook by id from user
 			if err != nil {
-				http.Error(w, "Something went wrong when getting a webhook: " + err.Error(), statusCode)
+				http.Error(w, "Something went wrong when getting a webhook: "+err.Error(), statusCode)
 				return
 			}
 			http.Header.Add(w.Header(), "content-type", "application/json")
 			json.NewEncoder(w).Encode(&webhook)
 
 		} else if r.Method == "DELETE" {
-			statusCode, err := DB.DeleteWebhook(parts[2])		// Delete webhook with id gotten by user
+			statusCode, err := DB.DeleteWebhook(parts[2]) // Delete webhook with id gotten by user
 			if err != nil {
-				http.Error(w, "Something went wrong when deleting a webhook: " + err.Error(), statusCode)
+				http.Error(w, "Something went wrong when deleting a webhook: "+err.Error(), statusCode)
 				return
-			}  
+			}
 
 			// TODO: Send a message to user
 
@@ -371,9 +370,9 @@ func RegisterWebhook(w http.ResponseWriter, r *http.Request) {
 func GetLatest(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		currencyRequest := CurrencyRequest{}
-		decodeErr := json.NewDecoder(r.Body).Decode(&currencyRequest)	// Get POST-request
+		decodeErr := json.NewDecoder(r.Body).Decode(&currencyRequest) // Get POST-request
 		if decodeErr != nil {
-			http.Error(w, "Bad request: Decoding didn't work on POST-input. " + decodeErr.Error(), http.StatusBadRequest)
+			http.Error(w, "Bad request: Decoding didn't work on POST-input. "+decodeErr.Error(), http.StatusBadRequest)
 			return
 		}
 		if currencyRequest.BaseCurrency != "EUR" {
@@ -381,16 +380,16 @@ func GetLatest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		latestCurrency, _, statusCode, err := DB.GetLatest(currencyRequest.TargetCurrency)				// Get latest currency from database
+		latestCurrency, _, statusCode, err := DB.GetLatest(currencyRequest.TargetCurrency) // Get latest currency from database
 		if err != nil {
-			http.Error(w, "We got an error while getting latest currency: " + err.Error(), statusCode)
+			http.Error(w, "We got an error while getting latest currency: "+err.Error(), statusCode)
 			return
 		}
 
 		// TODO: Give output to user
 		http.Header.Add(w.Header(), "content-type", "text")
-		w.WriteHeader(statusCode)		
-		fmt.Fprintf(w,FloatToString(latestCurrency))
+		w.WriteHeader(statusCode)
+		fmt.Fprintf(w, FloatToString(latestCurrency))
 
 	} else {
 		http.Error(w, "Not implemented: We only support POST for this functionality.", http.StatusNotImplemented)
@@ -402,9 +401,9 @@ func GetLatest(w http.ResponseWriter, r *http.Request) {
 func GetAverage(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		currencyRequest := CurrencyRequest{}
-		decodeErr := json.NewDecoder(r.Body).Decode(&currencyRequest)	// Get POST-request
+		decodeErr := json.NewDecoder(r.Body).Decode(&currencyRequest) // Get POST-request
 		if decodeErr != nil {
-			http.Error(w, "Bad request: Decoding didn't work on POST-input. " + decodeErr.Error(), http.StatusBadRequest)
+			http.Error(w, "Bad request: Decoding didn't work on POST-input. "+decodeErr.Error(), http.StatusBadRequest)
 			return
 		}
 		if currencyRequest.BaseCurrency != "EUR" {
@@ -412,24 +411,22 @@ func GetAverage(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		averageCurrency, statusCode, err := DB.GetAverage(currencyRequest.TargetCurrency)				// Get the average currency from database
+		averageCurrency, statusCode, err := DB.GetAverage(currencyRequest.TargetCurrency) // Get the average currency from database
 		if err != nil {
-			http.Error(w, "We got an error while getting average currency: " + err.Error(), statusCode)
+			http.Error(w, "We got an error while getting average currency: "+err.Error(), statusCode)
 			return
 		}
 
 		// TODO: Give output to user
 		http.Header.Add(w.Header(), "content-type", "text")
-		w.WriteHeader(statusCode)		
-		fmt.Fprintf(w,FloatToString(averageCurrency))
+		w.WriteHeader(statusCode)
+		fmt.Fprintf(w, FloatToString(averageCurrency))
 
 	} else {
 		http.Error(w, "Not implemented: We only support POST for this functionality.", http.StatusNotImplemented)
 		return
 	}
 }
-
-
 
 /*// Checks if all currencies last 7-8 days is present
 func checkForLastWeekCurrencies(database ExchangeStorage) {
@@ -444,23 +441,23 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		webhooks, statusCode, err := DB.GetAllWebhooks()
 		if err != nil {
-			http.Error(w, "Failed to get all webhooks from database. Error: "  + err.Error(), statusCode)
+			http.Error(w, "Failed to get all webhooks from database. Error: "+err.Error(), statusCode)
 			return
 		}
-	
+
 		for i := 0; i < len(webhooks); i++ {
 			rateCurrency := webhooks[i].TargetCurrency
-			latestCurrency, _, statusCode, err := DB.GetLatest(rateCurrency)				// Get latest currency from database
-			statusCode, err = SendWebhookFunc(webhooks[i], latestCurrency)					// Sends latest currency
+			latestCurrency, _, statusCode, err := DB.GetLatest(rateCurrency) // Get latest currency from database
+			statusCode, err = SendWebhookFunc(webhooks[i], latestCurrency)   // Sends latest currency
 			if err != nil {
-				http.Error(w, "Failed to send webhook number " + string(i) + " from database (will not send any more webhooks if any). Error:" + err.Error(), statusCode)
+				http.Error(w, "Failed to send webhook number "+string(i)+" from database (will not send any more webhooks if any). Error:"+err.Error(), statusCode)
 				return
 			}
 		}
 
-		w.WriteHeader(http.StatusOK)		
+		w.WriteHeader(http.StatusOK)
 
 	} else {
-		http.Error(w,"Not implemented: We only support GET here", http.StatusNotImplemented)
+		http.Error(w, "Not implemented: We only support GET here", http.StatusNotImplemented)
 	}
 }

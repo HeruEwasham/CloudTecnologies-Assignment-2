@@ -26,7 +26,7 @@ func Test_FloatToString(t *testing.T) {
 }
 
 func Test_sendMsgWebhook(t *testing.T) {
-	msg := MessageWebhook {"Test", time.Now().Format("2006-01-02-15:04:05"),"This is a test, if this is registered it worked", "Cloud tecnologies: Assignment 2"}
+	msg := MessageWebhook{"Test", time.Now().Format("2006-01-02-15:04:05"), "This is a test, if this is registered it worked", "Cloud tecnologies: Assignment 2"}
 	ok := SendMessageWebhook(msg)
 	if !ok {
 		t.Error("Send Message didn't work")
@@ -35,8 +35,8 @@ func Test_sendMsgWebhook(t *testing.T) {
 
 func Test_RegisterAndGetWebhook(t *testing.T) {
 	setupTestdatabase() //?
-	testdb.Init()		//?
-	webhook := Webhook{WebhookURL:"http://example.com",BaseCurrency:"EUR",TargetCurrency:"NOK",MinTriggerValue: 1.5, MaxTriggerValue: 2.8}
+	testdb.Init()       //?
+	webhook := Webhook{WebhookURL: "http://example.com", BaseCurrency: "EUR", TargetCurrency: "NOK", MinTriggerValue: 1.5, MaxTriggerValue: 2.8}
 	id, statusCode, err := testdb.RegisterWebhookToDatabase(webhook)
 	if err != nil {
 		t.Error("Error when registering webhook, statuscode is ", statusCode, ", and error is ", err)
@@ -49,7 +49,7 @@ func Test_RegisterAndGetWebhook(t *testing.T) {
 
 	webhookGotten, statusCode, err := testdb.GetWebhook(id)
 	if err != nil {
-		t.Error("Error when getting webhook, id is: " + id + "statuscode is ", statusCode, ", and error is ", err)
+		t.Error("Error when getting webhook, id is: "+id+"statuscode is ", statusCode, ", and error is ", err)
 		return
 	}
 	if webhookGotten.BaseCurrency != webhook.BaseCurrency || webhookGotten.MaxTriggerValue != webhook.MaxTriggerValue || webhookGotten.MinTriggerValue != webhook.MinTriggerValue || webhookGotten.TargetCurrency != webhook.TargetCurrency || webhookGotten.WebhookURL != webhook.WebhookURL {
@@ -86,17 +86,17 @@ func Test_RegisterAndGetWebhook(t *testing.T) {
 }
 
 func Test_GetLatest(t *testing.T) {
-	setupTestdatabase() //?
-	testdb.Init()		//?
+	setupTestdatabase()                 //?
+	testdb.Init()                       //?
 	rateMap := make(map[string]float32) // Make a map with rates
 	rateMap["NOK"] = 1.56
-	currency := Currency{"EUR","2100-01-01",rateMap}
+	currency := Currency{"EUR", "2100-01-01", rateMap}
 	statusCode, err := testdb.RegisterCurrencyToDatabase(currency)
 	if err != nil {
 		t.Error("Error when registering currency, statuscode is ", statusCode, ", and error is ", err)
 		return
 	}
-	latestCurrency, _, statusCode, err := testdb.GetLatest("NOK")		// Testing by getting latest Currency for Norwegian Kroner
+	latestCurrency, _, statusCode, err := testdb.GetLatest("NOK") // Testing by getting latest Currency for Norwegian Kroner
 	if err != nil {
 		t.Error("Error when getting latest currency, statuscode is ", statusCode, ", and error is ", err)
 		return
@@ -114,31 +114,31 @@ func Test_GetLatest(t *testing.T) {
 }
 
 func Test_GetAverage(t *testing.T) {
-	setupTestdatabase() //?
-	testdb.Init()		//?
+	setupTestdatabase()                 //?
+	testdb.Init()                       //?
 	rateMap := make(map[string]float32) // Make a map with rates
 	var rateAverage float32
-	for i:=1;i<=3;i++ {
+	for i := 1; i <= 3; i++ {
 		rateMap["NOK"] = 1.56 + float32(i)
 		rateAverage += rateMap["NOK"]
-		currency := Currency{"EUR","2100-01-0" + string(i), rateMap}
+		currency := Currency{"EUR", "2100-01-0" + string(i), rateMap}
 		statusCode, err := testdb.RegisterCurrencyToDatabase(currency)
 		if err != nil {
 			t.Error("Error when registering currency number ", i, ", statuscode is ", statusCode, ", and error is ", err)
 			return
 		}
 	}
-	averageCurrrency, statusCode, err := testdb.GetAverage("NOK")		// Testing by getting latest Currency for Norwegian Kroner
+	averageCurrrency, statusCode, err := testdb.GetAverage("NOK") // Testing by getting latest Currency for Norwegian Kroner
 	if err != nil {
 		t.Error("Error when getting average currency, statuscode is ", statusCode, ", and error is ", err)
 		return
 	}
 
-	if averageCurrrency != (rateAverage/3) {
+	if averageCurrrency != (rateAverage / 3) {
 		t.Error("Average currency gotten is not the one inserted just before, latest currency inserted is ", rateAverage, ", while we got ", averageCurrrency)
 		return
 	}
-	
+
 	ok := testdb.ResetCurrency()
 
 	if !ok {

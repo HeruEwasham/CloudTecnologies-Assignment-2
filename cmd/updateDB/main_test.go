@@ -14,15 +14,15 @@ func setupTestdatabase() {
 }
 
 func Test_GetTodaysCurrency(t *testing.T) {
-	setupNormalDatabase()						// Test this part
-	setupTestdatabase() //?
-	testdb.Init()		//?
+	setupNormalDatabase() // Test this part
+	setupTestdatabase()   //?
+	testdb.Init()         //?
 	ok := getCurrencyFromExternalDatabase(testdb, "latest")
 	if !ok {
 		t.Error("Function getTodaysCurrency(..) failed.")
 		return
 	}
-	ok = getCurrencyFromExternalDatabase(testdb, "latest")		// Checks for some other parts of the function
+	ok = getCurrencyFromExternalDatabase(testdb, "latest") // Checks for some other parts of the function
 	if !ok {
 		t.Error("Function getTodaysCurrency(..) failed on second time.")
 		return
