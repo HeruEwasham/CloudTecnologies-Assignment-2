@@ -1,7 +1,7 @@
 package main
 
 import "net/http"
-import "Assignment2/exchange"
+import "github.com/HeruEwasham/CloudTecnologies-Assignment-2/exchange"
 import "fmt"
 import "os"
 

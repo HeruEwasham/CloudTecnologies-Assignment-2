@@ -3,7 +3,7 @@ package main
 import "time"
 import "net/http"
 import "encoding/json"
-import "Assignment2/exchange"
+import "github.com/HeruEwasham/CloudTecnologies-Assignment-2/exchange"
 
 // Is called every day
 func getCurrencyFromExternalDatabase(database exchange.Storage, date string) bool { // Argument is here used for testing
