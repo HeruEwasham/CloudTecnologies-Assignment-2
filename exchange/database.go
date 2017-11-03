@@ -20,14 +20,6 @@ type Webhook struct {
 	ID              string  `json:"id"`
 }
 
-/*// WebhookID - This is the struct which will hold the id if a given webhook when we ask about it
-type WebhookID struct {
-	ID          struct {
-		Text    string  `json:"oid"`
-	}   `json:"_id"`
-	WebhookURL  string   `json:"webhookurl"`		// To check if it is the correct webhook gotten
-}*/
-
 // CurrencyRequest - This is the struct which will hold information about currencies from user.
 type CurrencyRequest struct {
 	BaseCurrency   string `json:"baseCurrency"`
@@ -334,10 +326,10 @@ func RegisterWebhook(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(statusCode)
 			fmt.Fprintf(w, string(id))
 		} else {
-			http.Error(w, "Not implemented: We only support POST for this functionality.", http.StatusNotImplemented)
+			http.Error(w, "Method not allowed: We only support POST for this functionality, but you used " + r.Method + ".", http.StatusMethodNotAllowed)
 			return
 		}
-	} else if len(parts) == 3 /*&& parts[2] == "0"*/ { // Is /exchange/{id}
+	} else if len(parts) == 3 { // Is /exchange/{id}
 		if r.Method == "GET" {
 			webhook, statusCode, err := DB.GetWebhook(parts[2]) // Get webhook by id from user
 			if err != nil {
@@ -354,10 +346,8 @@ func RegisterWebhook(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			// TODO: Send a message to user
-
 		} else {
-			http.Error(w, "Not implemented: We only support GET and DELETE for this functionality.", http.StatusNotImplemented)
+			http.Error(w, "Method not allowed: We only support GET and DELETE for this functionality, but you used " + r.Method + ".", http.StatusMethodNotAllowed)
 			return
 		}
 	} else {
@@ -392,7 +382,7 @@ func GetLatest(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, FloatToString(latestCurrency))
 
 	} else {
-		http.Error(w, "Not implemented: We only support POST for this functionality.", http.StatusNotImplemented)
+		http.Error(w, "Method not allowed: We only support POST for this functionality, but you used " + r.Method + ".", http.StatusNotImplemented)
 		return
 	}
 }
@@ -427,14 +417,6 @@ func GetAverage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-/*// Checks if all currencies last 7-8 days is present
-func checkForLastWeekCurrencies(database ExchangeStorage) {
-	currentDate := time.Now()//.Format("2006-01-02")			// Gets the current date
-	for i := currentDate.AddDate(0, 0, -8); i.Format("2006-01-02") <= currentDate.Format("2006-01-02"); i = i.AddDate(0, 0, 1) {
-		getCurrencyFromExternalDatabase(database, i.Format("2006-01-02"))
-	}
-}*/
 
 // EvaluationTrigger triggers all webhooks to be sent
 func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {

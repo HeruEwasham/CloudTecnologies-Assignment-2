@@ -15,6 +15,15 @@ func setupTestdatabase() {
 	}
 }
 
+func webhookIsLike(webhook1 Webhook, webhook2 Webhook) bool {
+	// If anything is different between those two:
+	if webhook1.BaseCurrency != webhook2.BaseCurrency || webhook1.MaxTriggerValue != webhook2.MaxTriggerValue || webhook1.MinTriggerValue != webhook2.MinTriggerValue || webhook1.TargetCurrency != webhook2.TargetCurrency || webhook1.WebhookURL != webhook2.WebhookURL {
+		return false
+	}
+	// Else:
+	return true
+}
+
 func Test_FloatToString(t *testing.T) {
 	var input float32
 	input = 2.35
@@ -52,7 +61,7 @@ func Test_RegisterAndGetWebhook(t *testing.T) {
 		t.Error("Error when getting webhook, id is: "+id+"statuscode is ", statusCode, ", and error is ", err)
 		return
 	}
-	if webhookGotten.BaseCurrency != webhook.BaseCurrency || webhookGotten.MaxTriggerValue != webhook.MaxTriggerValue || webhookGotten.MinTriggerValue != webhook.MinTriggerValue || webhookGotten.TargetCurrency != webhook.TargetCurrency || webhookGotten.WebhookURL != webhook.WebhookURL {
+	if !webhookIsLike(webhookGotten, webhook) {
 		t.Error("base-webhook is different than the webhook gotten.")
 		return
 	}
@@ -68,7 +77,7 @@ func Test_RegisterAndGetWebhook(t *testing.T) {
 		return
 	}
 	fmt.Println(webhooksGotten)
-	if webhooksGotten[0].BaseCurrency != webhook.BaseCurrency || webhooksGotten[0].MaxTriggerValue != webhook.MaxTriggerValue || webhookGotten.MinTriggerValue != webhook.MinTriggerValue || webhookGotten.TargetCurrency != webhook.TargetCurrency || webhookGotten.WebhookURL != webhook.WebhookURL {
+	if !webhookIsLike(webhooksGotten[0], webhook) {
 		t.Error("base-webhook is different than the webhook gotten when calling for all.")
 		return
 	}

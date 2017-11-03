@@ -5,6 +5,13 @@ import "net/http"
 import "encoding/json"
 import "github.com/HeruEwasham/CloudTecnologies-Assignment-2/exchange"
 
+func sendMessageCheckOK(msg exchange.MessageWebhook) {
+	ok := exchange.SendMessageWebhook(msg)
+	if !ok {
+		println("Error when sending message-webhook")
+	}
+}
+
 // Is called every day
 func getCurrencyFromExternalDatabase(database exchange.Storage, date string) bool { // Argument is here used for testing
 	msg := exchange.MessageWebhook{}                               // Prepere errormessage if needed
@@ -17,10 +24,7 @@ func getCurrencyFromExternalDatabase(database exchange.Storage, date string) boo
 		err := "Failed to get fixer.io currency: " + httpErr.Error()
 		msg.Message = err
 		println(err)
-		ok := exchange.SendMessageWebhook(msg)
-		if !ok {
-			println("Error when sending message-webhook")
-		}
+		sendMessageCheckOK(msg)
 		return false
 	}
 
@@ -30,10 +34,7 @@ func getCurrencyFromExternalDatabase(database exchange.Storage, date string) boo
 		err := "Failed to get fixer.io currency decoded: " + httpErr.Error()
 		msg.Message = err
 		println(err)
-		ok := exchange.SendMessageWebhook(msg)
-		if !ok {
-			println("Error when sending message-webhook")
-		}
+		sendMessageCheckOK(msg)
 		return false
 	}
 
@@ -54,10 +55,7 @@ func getCurrencyFromExternalDatabase(database exchange.Storage, date string) boo
 			err := "Failed to register currency to database: " + err.Error()
 			msg.Message = err
 			println(err)
-			ok := exchange.SendMessageWebhook(msg)
-			if !ok {
-				println("Error when sending message-webhook")
-			}
+			sendMessageCheckOK(msg)
 			return false
 		}
 
@@ -81,10 +79,7 @@ func getCurrencyFromExternalDatabase(database exchange.Storage, date string) boo
 					err := "Failed to send webhook number " + string(i) + " from database (will not send any more webhooks if any), got statuscode " + string(statusCode) + ", with error: " + err.Error()
 					msg.Message = err
 					println(err)
-					ok := exchange.SendMessageWebhook(msg)
-					if !ok {
-						println("Error when sending message-webhook")
-					}
+					sendMessageCheckOK(msg)
 					return false
 				}
 			}
@@ -94,10 +89,7 @@ func getCurrencyFromExternalDatabase(database exchange.Storage, date string) boo
 		msg.Heading = "Registered new currency!"
 		msg.Message = message
 		println(message)
-		ok := exchange.SendMessageWebhook(msg)
-		if !ok {
-			println("Error when sending message-webhook")
-		}
+		sendMessageCheckOK(msg)
 		return true
 	}
 
@@ -105,10 +97,7 @@ func getCurrencyFromExternalDatabase(database exchange.Storage, date string) boo
 	msg.Heading = "No new currencies!"
 	msg.Message = message
 	println(message)
-	ok := exchange.SendMessageWebhook(msg)
-	if !ok {
-		println("Error when sending message-webhook")
-	}
+	sendMessageCheckOK(msg)
 	return true // This is also something that might be expected
 }
 
