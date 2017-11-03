@@ -326,7 +326,7 @@ func RegisterWebhook(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(statusCode)
 			fmt.Fprintf(w, string(id))
 		} else {
-			http.Error(w, "Method not allowed: We only support POST for this functionality, but you used " + r.Method + ".", http.StatusMethodNotAllowed)
+			http.Error(w, "Method not allowed: We only support POST for this functionality, but you used "+r.Method+".", http.StatusMethodNotAllowed)
 			return
 		}
 	} else if len(parts) == 3 { // Is /exchange/{id}
@@ -347,7 +347,7 @@ func RegisterWebhook(w http.ResponseWriter, r *http.Request) {
 			}
 
 		} else {
-			http.Error(w, "Method not allowed: We only support GET and DELETE for this functionality, but you used " + r.Method + ".", http.StatusMethodNotAllowed)
+			http.Error(w, "Method not allowed: We only support GET and DELETE for this functionality, but you used "+r.Method+".", http.StatusMethodNotAllowed)
 			return
 		}
 	} else {
@@ -382,7 +382,7 @@ func GetLatest(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, FloatToString(latestCurrency))
 
 	} else {
-		http.Error(w, "Method not allowed: We only support POST for this functionality, but you used " + r.Method + ".", http.StatusNotImplemented)
+		http.Error(w, "Method not allowed: We only support POST for this functionality, but you used "+r.Method+".", http.StatusNotImplemented)
 		return
 	}
 }
