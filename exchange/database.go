@@ -287,7 +287,7 @@ func SendWebhookFunc(webhook Webhook, currentRate float32) (int, error) {
 	if resp.StatusCode == 200 || resp.StatusCode == 204 {
 		return http.StatusOK, nil // Has done the job without problems.
 	}
-	return http.StatusBadRequest, errors.New("We didn't get the correct statuscode, we got" + strconv.Itoa(resp.StatusCode) + ", but expected 200 or 204 when sending json ")
+	return http.StatusBadRequest, errors.New("We didn't get the correct statuscode, we got " + strconv.Itoa(resp.StatusCode) + ", but expected 200 or 204 when sending json ")
 	//}
 	//return http.StatusExpectationFailed, errors.New("Error when checking between values") // errors.New("Current rate is " + string(currentRate) + " which is between min and max, which is " + string(webhook.MinTriggerValue) + " and " + string(webhook.MaxTriggerValue))				// An error message if needed for debugging.
 }
@@ -441,7 +441,7 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 			latestCurrency, _, statusCode, err := DB.GetLatest(rateCurrency) // Get latest currency from database
 			statusCode, err = SendWebhookFunc(webhooks[i], latestCurrency)   // Sends latest currency
 			if err != nil {
-				http.Error(w, "Failed to send webhook number "+string(i)+" from database (will not send any more webhooks if any). Error:"+err.Error(), statusCode)
+				http.Error(w, "Failed to send webhook number "+strconv.Itoa(i)+" from database (will not send any more webhooks if any). Error:"+err.Error(), statusCode)
 				return
 			}
 		}
