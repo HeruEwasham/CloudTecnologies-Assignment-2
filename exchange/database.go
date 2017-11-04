@@ -271,23 +271,23 @@ func SendWebhookFunc(webhook Webhook, currentRate float32) (int, error) {
 	// This code gotten from: https://stackoverflow.com/questions/24455147/how-do-i-send-a-json-string-in-a-post-request-in-go
 	jsonStr := new(bytes.Buffer)
 	json.NewEncoder(jsonStr).Encode(&sendWebhook)
-	jsonString := jsonStr.String()
-	println(jsonString)
+	//println(jsonString)
 	//resp, err := http.Post(webhook.WebhookURL, "application/json", jsonStr)
 	req, err := http.NewRequest("POST", webhook.WebhookURL, jsonStr)
-    //req.Header.Set("X-Custom-Header", "myvalue")
-    req.Header.Set("Content-Type", "application/json")
+	//req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return http.StatusExpectationFailed, err // http.StatusExpectationFailed hears out to be the best when not connecting to url (or something there)
 	}
+	println(resp.StatusCode)
 	defer resp.Body.Close()
 	if resp.StatusCode == 200 || resp.StatusCode == 204 {
 		return http.StatusOK, nil // Has done the job without problems.
 	}
-	return http.StatusBadRequest, errors.New("We didn't get the correct statuscode, we got" + string(resp.StatusCode) + ", but expected 200 or 204 when sending json " + jsonString)
+	return http.StatusBadRequest, errors.New("We didn't get the correct statuscode, we got" + strconv.Itoa(resp.StatusCode) + ", but expected 200 or 204 when sending json ")
 	//}
 	//return http.StatusExpectationFailed, errors.New("Error when checking between values") // errors.New("Current rate is " + string(currentRate) + " which is between min and max, which is " + string(webhook.MinTriggerValue) + " and " + string(webhook.MaxTriggerValue))				// An error message if needed for debugging.
 }
@@ -436,7 +436,7 @@ func EvaluationTrigger(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for i := 0; i < len(webhooks); i++ {
-			fmt.Fprint(w,string(webhooks[i].WebhookURL))
+			//fmt.Fprint(w, string(webhooks[i].WebhookURL))
 			rateCurrency := webhooks[i].TargetCurrency
 			latestCurrency, _, statusCode, err := DB.GetLatest(rateCurrency) // Get latest currency from database
 			statusCode, err = SendWebhookFunc(webhooks[i], latestCurrency)   // Sends latest currency
