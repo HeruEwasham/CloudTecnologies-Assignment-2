@@ -104,7 +104,7 @@ func getCurrencyFromExternalDatabase(database exchange.Storage, date string) boo
 func databaseCred(test bool) *exchange.MongoDB {
 	if test {
 		return &exchange.MongoDB{
-			DatabaseURL:            "mongodb://CloudFullAccess:full1916@ds227045.mlab.com:27045/herus-cloud-tecnologies",
+			DatabaseURL:            "mongodb://localhost",
 			DatabaseName:           "herus-cloud-tecnologies",
 			WebhookCollectionName:  "webhooks_test",
 			CurrencyCollectionName: "currencies_test",
